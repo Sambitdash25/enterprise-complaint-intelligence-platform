@@ -131,3 +131,27 @@ N --> O
 | Database Layer          | Persists complaints, AI predictions, assignments, and audit information.                                                         |
 | Logging & Monitoring    | Records application logs, processing metrics, and operational events for monitoring and troubleshooting.                         |
 
+
+## Folder Mapping
+
+The project structure is organized so that each major architectural component has a dedicated location within the codebase.
+
+| Folder | Purpose |
+|---------|---------|
+| `app/api/` | REST API endpoints for interacting with the platform. |
+| `app/agents/` | AI components responsible for LLM interaction and response generation. |
+| `app/services/` | Core business services such as preprocessing, translation, and assignment. |
+| `app/rules/` | Business rules and validation logic. |
+| `app/prompts/` | Prompt templates used by the LLM. |
+| `app/models/` | Data models and schemas. |
+| `app/database/` | Database connection, ORM models, and persistence logic. |
+| `app/evaluation/` | Confidence evaluation and AI output validation. |
+| `app/utils/` | Shared utility functions and helper modules. |
+| `app/config/` | Application configuration and environment settings. |
+| `tests/` | Unit and integration tests. |
+| `docker/` | Docker-related configuration files. |
+| `scripts/` | Utility scripts for development and deployment. |
+| `docs/` | Project documentation and architecture. |
+| `sample_data/` | Sample datasets for development and testing. |
+
+The modular structure ensures that each component has a clear responsibility, making the platform easier to maintain, test, and extend as new capabilities are introduced.
