@@ -7,7 +7,7 @@ click==8.4.2
 colorama==0.4.6
 distlib==0.4.3
 et_xmlfile==2.0.0
-fastapi==0.138.1
+fastapi==0.139.0
 filelock==3.29.4
 h11==0.16.0
 identify==2.6.19
@@ -25,6 +25,7 @@ platformdirs==4.10.0
 pluggy==1.6.0
 pre_commit==4.6.0
 pydantic==2.13.4
+pydantic-settings==2.14.2
 pydantic_core==2.46.4
 Pygments==2.20.0
 pytest==9.1.1
