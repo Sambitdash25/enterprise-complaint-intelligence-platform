@@ -1938,3 +1938,64 @@ The Repository Pattern separates database access logic from business logic by pr
 
 Keeping database queries inside repositories prevents tight coupling between the API and the database, making the application easier to maintain, test, and modify.
 
+# SQLAlchemy Base
+
+## What is Base?
+
+The Base class is the parent class for all SQLAlchemy ORM models.
+
+Every database table is represented as a Python class that inherits from Base.
+
+---
+
+## What is Declarative Mapping?
+
+Declarative Mapping is SQLAlchemy's approach of defining database tables using Python classes.
+
+Instead of writing SQL manually, developers define classes and SQLAlchemy maps them to relational tables.
+
+---
+
+## Why use DeclarativeBase?
+
+`DeclarativeBase` is the modern SQLAlchemy 2.x approach for creating the base ORM class.
+
+It replaces the older `declarative_base()` API and provides improved typing support and cleaner syntax.
+
+---
+
+## Interview Questions
+
+### Q. Why inherit from Base?
+
+**Answer**
+
+Inheriting from Base registers the class with SQLAlchemy's ORM system, enabling it to map the class to a database table and manage its metadata.
+
+---
+
+### Q. What is Declarative Mapping?
+
+**Answer**
+
+Declarative Mapping is the process of defining database tables as Python classes, allowing SQLAlchemy to automatically map objects to relational database records.
+
+---
+
+## Quick Revision
+
+Python Class
+
+↓
+
+Inherit Base
+
+↓
+
+SQLAlchemy Model
+
+↓
+
+Database Table
+
+
