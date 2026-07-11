@@ -2425,3 +2425,59 @@ Prediction
 Linked using a Foreign Key.
 
 
+# UUID in SQLAlchemy
+
+## Why use UUID?
+
+UUID (Universally Unique Identifier) provides globally unique identifiers without relying on database-generated sequential IDs.
+
+Advantages:
+
+- Globally unique
+- Better suited for distributed systems
+- Harder to guess than sequential IDs
+- Can be generated before inserting into the database
+- Common in enterprise applications
+
+---
+
+## SQLAlchemy Implementation
+
+```python
+import uuid
+from sqlalchemy import UUID
+
+complaint_id: Mapped[uuid.UUID] = mapped_column(
+    UUID(as_uuid=True),
+    primary_key=True,
+    default=uuid.uuid4,
+)
+```
+
+---
+
+## What does `default=uuid.uuid4` do?
+
+Automatically generates a new UUID whenever a new object is created.
+
+No manual ID generation is required.
+
+---
+
+## Why `UUID(as_uuid=True)`?
+
+It tells SQLAlchemy to map the database UUID type to Python's `uuid.UUID` object instead of treating it as a plain string.
+
+This improves type safety and readability.
+
+---
+
+## Interview Questions
+
+### Q. Why choose UUID over Integer IDs?
+
+**Answer**
+
+UUIDs support distributed architectures, avoid ID collisions across systems, improve security by making IDs difficult to predict, and allow identifiers to be generated at the application layer before database insertion.
+
+

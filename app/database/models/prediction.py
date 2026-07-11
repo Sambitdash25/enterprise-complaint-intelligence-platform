@@ -1,7 +1,8 @@
-from sqlalchemy import Float, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+import uuid
 
-from app.database.base import Base
+from sqlalchemy import Float, ForeignKey, Integer, String, Text
+from sqlalchemy import UUID
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class Prediction(Base):
@@ -11,16 +12,17 @@ class Prediction(Base):
 
     __tablename__ = "predictions"
 
-    prediction_id: Mapped[str] = mapped_column(
-        String(36),
+    prediction_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
         primary_key=True,
-    )
+        default=uuid.uuid4,
+        )
 
-    complaint_id: Mapped[str] = mapped_column(
-        String(36),
+    complaint_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
         ForeignKey("complaints.complaint_id"),
         nullable=False,
-    )
+        )
 
     severity_score: Mapped[int] = mapped_column(
         Integer,

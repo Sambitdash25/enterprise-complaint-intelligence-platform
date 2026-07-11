@@ -1,6 +1,9 @@
-from datetime import datetime
-from sqlalchemy import DateTime,String,Text 
-from sqlalchemy.orm import Mapped,mapped_column
+import uuid
+from datetime import datetime, UTC
+
+from sqlalchemy import DateTime, String, Text
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import UUID
 
 from app.database.base import Base
 
@@ -12,9 +15,10 @@ class Complaint(Base):
      
      
      __tablename__ = "complaints"
-     complaint_id: Mapped(str) = mapped_column(
-          String(36),
-          primary_key = True,
+     complaint_id: Mapped[uuid.UUID] = mapped_column(
+          UUID(as_uuid=True),
+          primary_key=True,
+          default=uuid.uuid4,
      )
 
      customer_id: Mapped(str) = mapped_column(
@@ -48,14 +52,14 @@ class Complaint(Base):
      )
 
      created_at: Mapped[datetime] = mapped_column(
-         DateTime,
-         default=datetime.utcnow,
-         nullable=False,
-     )
+          DateTime(timezone=True),
+          default=lambda: datetime.now(UTC),
+          nullable=False,
+          )
 
      updated_at: Mapped[datetime] = mapped_column(
-         DateTime,
-         default=datetime.utcnow,
-         onupdate=datetime.utcnow,
-         nullable=False,
-     )
+          DateTime(timezone=True),
+          default=lambda: datetime.now(UTC),
+          onupdate=lambda: datetime.now(UTC),
+          nullable=False,
+          )
