@@ -1999,3 +1999,429 @@ SQLAlchemy Model
 Database Table
 
 
+# Sprint 1 – Task 3
+
+# SQLAlchemy Engine & Session
+
+## Objective
+
+Understand how a FastAPI application communicates with a PostgreSQL database using SQLAlchemy.
+
+The Engine manages the database connection, while the Session manages database operations for each request.
+
+---
+
+## Database Communication Flow
+
+Client
+
+↓
+
+FastAPI API
+
+↓
+
+Service Layer
+
+↓
+
+Repository Layer
+
+↓
+
+SQLAlchemy Session
+
+↓
+
+SQLAlchemy Engine
+
+↓
+
+PostgreSQL
+
+---
+
+## What is SQLAlchemy Engine?
+
+The Engine is responsible for connecting the application to the database.
+
+It stores all database connection information and manages the connection pool.
+
+Think of it as the bridge between Python and PostgreSQL.
+
+Responsibilities:
+
+- Database connectivity
+- Connection pooling
+- Database communication
+- Creating connections when required
+
+The Engine itself does **not** execute business operations.
+
+---
+
+## What is a Session?
+
+A Session represents a **single unit of work** with the database.
+
+Every API request typically creates one Session.
+
+Example:
+
+API Request
+
+↓
+
+Create Session
+
+↓
+
+Execute Queries
+
+↓
+
+Commit / Rollback
+
+↓
+
+Close Session
+
+Responsibilities:
+
+- Execute database queries
+- Track object changes
+- Commit transactions
+- Rollback on failures
+- Close database connection
+
+---
+
+## What is SessionLocal?
+
+SessionLocal is a Session Factory.
+
+It is **not** a Session.
+
+Whenever the application needs to interact with the database, it creates a new Session using:
+
+```python
+db = SessionLocal()
+```
+
+After all operations are complete:
+
+```python
+db.close()
+```
+
+Each request gets its own independent Session.
+
+---
+
+## Why not use Engine directly?
+
+The Engine only knows **how to connect** to the database.
+
+The Session manages:
+
+- Transactions
+- Object lifecycle
+- Commit
+- Rollback
+- Query execution
+
+Therefore:
+
+Engine → Connectivity
+
+Session → Database Operations
+
+---
+
+## Database URL
+
+Instead of hardcoding connection details, the application reads them from `.env`.
+
+Example:
+
+DATABASE_HOST
+
+DATABASE_PORT
+
+DATABASE_NAME
+
+DATABASE_USER
+
+DATABASE_PASSWORD
+
+These values are loaded through `settings.py` and combined into a SQLAlchemy connection string.
+
+---
+
+## Why use `autocommit=False`?
+
+Suppose the application performs three operations:
+
+Insert Complaint
+
+↓
+
+Generate Prediction
+
+↓
+
+Assign Employee
+
+If the third step fails,
+
+the first two should **not** remain in the database.
+
+Instead, SQLAlchemy performs a **Rollback**.
+
+This keeps the database consistent.
+
+---
+
+## Why use `autoflush=False`?
+
+SQLAlchemy keeps object changes in memory until we explicitly decide to write them to the database.
+
+This gives the application better control over database operations.
+
+---
+
+## Interview Questions
+
+### Q. What is SQLAlchemy Engine?
+
+**Answer**
+
+The SQLAlchemy Engine is responsible for database connectivity. It manages the connection pool and provides the interface through which SQLAlchemy communicates with the database.
+
+---
+
+### Q. What is a Session?
+
+**Answer**
+
+A Session is a unit of work that manages all database operations for a request, including queries, commits, rollbacks, and object state management.
+
+---
+
+### Q. What is SessionLocal?
+
+**Answer**
+
+SessionLocal is a Session Factory. It creates a new database Session whenever the application needs to interact with the database. Each request receives its own independent Session.
+
+---
+
+### Q. What is the difference between Engine and Session?
+
+**Answer**
+
+The Engine manages connectivity to the database and connection pooling.
+
+The Session manages transactions, query execution, commits, rollbacks, and the lifecycle of database objects.
+
+---
+
+### Q. Why is `autocommit=False` recommended?
+
+**Answer**
+
+It ensures multiple database operations are treated as a single transaction. If one operation fails, the entire transaction can be rolled back, preventing partial or inconsistent data from being stored.
+
+---
+
+## Quick Revision
+
+Engine
+
+↓
+
+Creates Database Connections
+
+↓
+
+Session Factory (SessionLocal)
+
+↓
+
+Session
+
+↓
+
+Execute Queries
+
+↓
+
+Commit / Rollback
+
+↓
+
+Close Session
+
+---
+
+## Key Takeaways
+
+- Engine manages connectivity.
+- Session manages database work.
+- SessionLocal creates Sessions.
+- Every API request gets a separate Session.
+- Transactions ensure data consistency.
+- Rollback prevents partial database updates.
+- FastAPI never communicates directly with PostgreSQL; all database operations flow through SQLAlchemy.
+
+
+# First SQLAlchemy Model – Complaint
+
+## What is an ORM Model?
+
+An ORM model is a Python class that represents a database table.
+
+Each object created from the class corresponds to one row in the database.
+
+---
+
+## Key Components
+
+### __tablename__
+
+Defines the database table name.
+
+Example:
+
+```python
+__tablename__ = "complaints"
+```
+
+---
+
+### Mapped[]
+
+Provides type-safe ORM field definitions in SQLAlchemy 2.x.
+
+---
+
+### mapped_column()
+
+Defines database columns and their constraints.
+
+Examples:
+
+- Data type
+- Primary key
+- Nullable
+- Default value
+
+---
+
+### Text vs String
+
+Use `Text` for long-form complaint descriptions.
+
+Use `String` for short structured values like IDs, status, or source.
+
+---
+
+### created_at
+
+Stores the creation timestamp.
+
+Never changes.
+
+---
+
+### updated_at
+
+Automatically updates whenever the record changes.
+
+---
+
+## Interview Questions
+
+### Q. What is an ORM Model?
+
+**Answer**
+
+An ORM model is a Python class mapped to a relational database table. Each instance of the class represents a row in the corresponding table.
+
+---
+
+### Q. Why use SQLAlchemy 2.x typed models?
+
+**Answer**
+
+Typed models improve readability, IDE support, type checking, and align with modern SQLAlchemy best practices.
+
+---
+
+## Quick Revision
+
+Python Class
+
+↓
+
+ORM Model
+
+↓
+
+Database Table
+
+↓
+
+Rows become Python Objects
+
+
+# Prediction ORM Model
+
+## New Concept – Foreign Key
+
+A Foreign Key links one table to another.
+
+Example:
+
+Complaint
+
+↓
+
+Prediction
+
+Every Prediction must reference an existing Complaint.
+
+This maintains referential integrity.
+
+---
+
+## Why use Foreign Keys?
+
+- Prevent invalid data
+- Enforce relationships
+- Improve database consistency
+- Support joins between tables
+
+---
+
+## Interview Questions
+
+### Q. What is Referential Integrity?
+
+**Answer**
+
+Referential Integrity ensures that relationships between tables remain valid. A Foreign Key guarantees that referenced records exist in the parent table before a child record can be created.
+
+---
+
+### Quick Revision
+
+Complaint
+
+↓
+
+Prediction
+
+Linked using a Foreign Key.
+
+
