@@ -21,9 +21,9 @@ class Complaint(Base):
           default=uuid.uuid4,
      )
 
-     customer_id: Mapped(str) = mapped_column(
+     customer_id: Mapped[str] = mapped_column(
           String(50),
-          nullable= False,
+          nullable=False,
      )
 
      complaint_text: Mapped[str] = mapped_column(

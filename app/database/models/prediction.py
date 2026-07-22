@@ -4,6 +4,8 @@ from sqlalchemy import Float, ForeignKey, Integer, String, Text
 from sqlalchemy import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.database.base import Base
+
 
 class Prediction(Base):
     """

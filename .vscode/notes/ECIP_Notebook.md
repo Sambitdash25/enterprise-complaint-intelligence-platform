@@ -2481,3 +2481,312 @@ This improves type safety and readability.
 UUIDs support distributed architectures, avoid ID collisions across systems, improve security by making IDs difficult to predict, and allow identifiers to be generated at the application layer before database insertion.
 
 
+# Employee ORM Model
+
+## Purpose
+
+Represents employees who can receive complaint assignments.
+
+The model stores only operational information required for intelligent routing.
+
+It is not intended to replace an HR database.
+
+---
+
+## New Concept – Default Values
+
+Some fields naturally have an initial value.
+
+Example:
+
+```python
+workload = 0
+availability = "Available"
+```
+
+These defaults are automatically assigned when a new employee record is created.
+
+---
+
+## Why use defaults?
+
+Advantages:
+
+- Cleaner code
+- Consistent initial state
+- Less manual initialization
+- Reduced application logic
+
+---
+
+## Interview Questions
+
+### Q. Why use default values in SQLAlchemy?
+
+**Answer**
+
+Default values ensure newly created records start with predictable values, improving consistency and reducing repetitive initialization logic in the application.
+
+
+# Assignment ORM Model
+
+## Purpose
+
+The Assignment model represents the process of assigning complaints to employees.
+
+It separates workflow history from the complaint itself.
+
+---
+
+## New Concept – Multiple Foreign Keys
+
+Assignment references two parent entities:
+
+Complaint
+
+Employee
+
+This allows the application to determine:
+
+- Which employee handled a complaint.
+- Which complaints an employee handled.
+
+---
+
+## Why separate Assignment?
+
+Assignments change over time.
+
+A complaint may be reassigned multiple times.
+
+Keeping Assignment separate preserves history and supports auditing.
+
+---
+
+## Why is completed_at nullable?
+
+A complaint is not completed immediately after assignment.
+
+The completion timestamp becomes available only when work is finished.
+
+---
+
+## Interview Questions
+
+### Q. What is a junction table?
+
+**Answer**
+
+A junction table links two entities together and is commonly used to represent relationships while storing additional information about the relationship itself, such as assignment time or status.
+
+---
+
+### Q. Why use multiple Foreign Keys?
+
+**Answer**
+
+Multiple Foreign Keys allow a table to establish relationships with multiple parent entities while maintaining referential integrity.
+
+
+# Audit Log ORM Model
+
+## Purpose
+
+The Audit Log stores the history of important events that occur during a complaint's lifecycle.
+
+Unlike the Complaint table, which stores the current state, the Audit Log preserves every significant action performed on the complaint.
+
+---
+
+## Typical Events
+
+- Complaint Created
+- AI Prediction Generated
+- Complaint Assigned
+- Complaint Reassigned
+- Complaint Resolved
+- Complaint Closed
+
+---
+
+## Fields
+
+### audit_id
+
+Unique identifier for the audit record.
+
+---
+
+### complaint_id
+
+Foreign Key linking the audit event to the complaint.
+
+---
+
+### event_type
+
+Short description of the event.
+
+Example:
+
+- Assigned
+- Closed
+- Reassigned
+
+---
+
+### event_details
+
+Detailed description explaining what happened.
+
+---
+
+### created_at
+
+Timestamp indicating when the event occurred.
+
+---
+
+## Why separate Audit Log?
+
+Keeping historical events separate from business entities provides:
+
+- Complete traceability
+- Easier debugging
+- Regulatory compliance
+- Historical reporting
+- Better system transparency
+
+---
+
+## Interview Questions
+
+### Q. Why use an Audit Log?
+
+**Answer**
+
+An Audit Log preserves the complete history of important system events. It enables traceability, debugging, compliance, and historical analysis without modifying the core business entities.
+
+---
+
+### Q. Why not store audit information in the Complaint table?
+
+**Answer**
+
+The Complaint table represents the current state of a complaint. Historical events are stored separately to avoid overwriting previous actions and to maintain a complete lifecycle history.
+
+---
+
+## Quick Revision
+
+Complaint
+
+↓
+
+Audit Log
+
+One Complaint
+
+↓
+
+Many Audit Events
+
+
+# Registering ORM Models
+
+## Why register models?
+
+SQLAlchemy creates tables only for models that have been imported and registered.
+
+The `models/__init__.py` file imports every ORM model, ensuring they are available when the application initializes the database.
+
+---
+
+## Why use `__all__`?
+
+`__all__` defines the public interface of the package.
+
+It specifies which objects should be exported when importing from the package.
+
+Although wildcard imports are generally discouraged, `__all__` documents the package contents clearly and provides a consistent public API.
+
+---
+
+## Interview Questions
+
+### Q. Why create a `models/__init__.py` file?
+
+**Answer**
+
+It centralizes model imports, simplifies package usage, and ensures SQLAlchemy is aware of every ORM model before creating database tables.
+
+---
+
+### Q. What does `__all__` do?
+
+**Answer**
+
+`__all__` defines the public objects exported by a Python package. It improves code clarity and controls what is imported when using wildcard imports.
+
+
+# Database Initialization
+
+## Purpose
+
+The database initialization script creates the database schema from the ORM models.
+
+It uses SQLAlchemy metadata to generate SQL CREATE TABLE statements automatically.
+
+---
+
+## Base.metadata
+
+`Base.metadata` stores the definitions of every ORM model.
+
+It includes:
+
+- Tables
+- Columns
+- Primary Keys
+- Foreign Keys
+- Constraints
+
+SQLAlchemy uses this metadata to generate the database schema.
+
+---
+
+## create_all()
+
+`create_all()` creates every table that does not already exist.
+
+It does **not** modify existing tables.
+
+---
+
+## Why use create_all()?
+
+Suitable for:
+
+- Learning
+- Initial development
+- Small prototypes
+
+Production applications typically use migration tools (such as Alembic) for schema evolution.
+
+---
+
+## Interview Questions
+
+### Q. What is Base.metadata?
+
+**Answer**
+
+Base.metadata is SQLAlchemy's registry of ORM table definitions. It stores the information required to generate database tables.
+
+### Q. Does create_all() update existing tables?
+
+**Answer**
+
+No. It only creates tables that do not already exist. Schema changes require migrations.
+
+
